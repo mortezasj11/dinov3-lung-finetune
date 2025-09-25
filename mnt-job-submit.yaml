@@ -1,0 +1,99 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: msalehjahromi-histology-mnt-me-10
+  namespace: yn-gpu-workload
+  labels:
+    k8s-user: msalehjahromi
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      nodeSelector:
+        gpu-type: A100
+      securityContext:
+        runAsUser: 271030
+        runAsGroup: 600651
+        fsGroup: 600651
+        supplementalGroups:
+          - 1944259512
+          - 1944285520
+          - 1944385884
+      volumes:
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Gi
+        - name: ifp
+          persistentVolumeClaim:
+            claimName: msalehjahromi-gpu-rsrch7-home-ip-rsrch
+        - name: home
+          persistentVolumeClaim:
+            claimName: msalehjahromi-gpu-home
+
+        # ─── LOCAL EMPTYDIR FOR FAST I/O ───────────────────────────
+        - name: shared-data
+          emptyDir: {}
+
+      # ─── COPY DATA BEFORE main ───────────────────────────────────
+      initContainers:
+        - name: data-copy
+          image: busybox
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp -r /rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/ready_finetune_max192_npz_mnt/ \
+                    /shared/
+          volumeMounts:
+            - name: ifp
+              mountPath: /rsrch7/home/ip_rsrch/wulab
+            - name: shared-data
+              mountPath: /shared
+
+      containers:
+        - name: main
+          image: hpcharbor.mdanderson.edu/msalehjahromi/torchrun-ftn-ddp:1.0.0
+          command: ["torchrun"]
+          args:
+            [
+              "--nproc_per_node=1",
+              "--nnodes=1",
+              "--node_rank=0",
+              "--master_addr=$(MASTER_ADDR)",
+              "--master_port=$(MASTER_PORT)",
+              "/rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/run_fineTune_single_gpu_launcher_mnt.py"
+            ]
+          env:
+            - name: MASTER_ADDR
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MASTER_PORT
+              value: "29500"
+            - name: NCCL_DEBUG
+              value: "INFO"
+            - name: NCCL_SOCKET_IFNAME
+              value: "eth0"
+            - name: NCCL_IB_DISABLE
+              value: "1"
+          volumeMounts:
+            - name: shm
+              mountPath: "/dev/shm"
+            - name: ifp
+              mountPath: "/rsrch7/home/ip_rsrch/wulab"
+            - name: home
+              mountPath: "/rsrch1/ip/msalehjahromi"
+
+            # ─── MOUNT LOCAL COPY AT YOUR PATH ────────────────────────
+            - name: shared-data
+              mountPath: /shared
+
+          resources:
+            limits:
+              nvidia.com/gpu: "1"
+            requests:
+              nvidia.com/gpu: "1"
+          imagePullPolicy: Always
+
+      restartPolicy: Never
