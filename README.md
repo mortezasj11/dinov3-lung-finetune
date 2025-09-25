@@ -85,21 +85,6 @@ OUTPUT_DIR = f"output6_ALL_ME_{get_output_dir_name()}"
 | 1   | 2e-4          | 0.33    | True            | True       | lr2e-4_tau0.33_waqasT_focalT |
 | 2   | 2e-4          | 0.33    | True            | False      | lr2e-4_tau0.33_waqasT_focalF |
 
-| 5   | 2e-4          | 1.0     | True            | True       | lr2e-4_tau1.0_waqasT_focalT |
-| 6   | 2e-4          | 1.0     | True            | False      | lr2e-4_tau1.0_waqasT_focalF |
-
-| 9   | 1e-3          | 0.33    | True            | True       | lr1e-3_tau0.33_waqasT_focalT |
-| 10  | 1e-3          | 0.33    | True            | False      | lr1e-3_tau0.33_waqasT_focalF |
-
-| 13  | 1e-3          | 1.0     | True            | True       | lr1e-3_tau1.0_waqasT_focalT |
-| 14  | 1e-3          | 1.0     | True            | False      | lr1e-3_tau1.0_waqasT_focalF |
-
-| 17  | 5e-3          | 0.33    | True            | True       | lr5e-3_tau0.33_waqasT_focalT |
-| 18  | 5e-3          | 0.33    | True            | False      | lr5e-3_tau0.33_waqasT_focalF |
-
-| 21  | 5e-3          | 1.0     | True            | True       | lr5e-3_tau1.0_waqasT_focalT |
-| 22  | 5e-3          | 1.0     | True            | False      | lr5e-3_tau1.0_waqasT_focalF |
-
 
 ## Kubernetes Deployment
 
