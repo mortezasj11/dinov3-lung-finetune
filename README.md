@@ -17,6 +17,13 @@ This repository contains a single-GPU training pipeline for multi-task histology
 - **Flexible Deployment**: MNT and SCC Kubernetes job modes
 - **Comprehensive Logging**: Training logs, metrics tracking, checkpoint management
 
+## Visualization
+
+### Attention Head Overlay
+![Attention Head Overlay](images/attn_heads_overlay_grid_.mp4)
+
+*Video showing attention head overlays on histology images during training*
+
 ## Deployment Modes
 - **MNT**: Data staged under /shared by mount/copy (`mnt-job-submit.yaml`)
 - **SCC**: Similar flow with different launcher and job spec (`scc-job-submit.yaml`)
