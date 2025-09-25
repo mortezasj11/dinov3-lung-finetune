@@ -65,7 +65,16 @@ python run_fineTune_single_gpu_launcher_scc.py \
 - **Sampling**: Random chunk fraction (0.3-1.0) for training, all chunks for validation
 - **Outputs**: `{output}/training.log`, checkpoints, metrics directory
 
-## Hyperparameter Grid Example
+## Hyperparameter Grid Example (which based on this I change the lines in launcher as)
+
+**Note**: Update the launcher file with:
+```python
+DEFAULT_LEARNING_RATE = 2e-4        # Learning rate for training
+DEFAULT_LSE_TAU = 1.0                # Temperature parameter for LSE aggregation
+DEFAULT_WAQAS_WAY = True             # Set to True to use Waqas attention aggregation
+FOCAL_LOSS = False                  # Set to True to use focal loss
+OUTPUT_DIR = f"output6_ALL_ME_{get_output_dir_name()}"
+```
 
 | Run | Learning Rate | LSE Tau | Waqas Attention | Focal Loss | Job Name Hint |
 | --- | ------------- | ------- | --------------- | ---------- | ------------- |
