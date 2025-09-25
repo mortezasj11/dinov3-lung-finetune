@@ -20,7 +20,7 @@ This repository contains a single-GPU training pipeline for multi-task histology
 ## Visualization
 
 ### Attention Head Overlay
-![Attention Overlay](images/attn_heads_overlay_grid.gif)
+![Attention Overlay](images/attn_heads_grid.gif)
 
 
 *Video showing attention head overlays on histology images during training*
