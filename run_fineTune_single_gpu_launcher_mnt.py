@@ -72,7 +72,7 @@ print("DEBUG: Single-GPU launcher script is starting...")
 DEFAULT_LEARNING_RATE = 1e-3        # Learning rate for training
 DEFAULT_LSE_TAU = 0.33                # Temperature parameter for LSE aggregation
 DEFAULT_WAQAS_WAY = True             # Set to True to use Waqas attention aggregation
-FOCAL_LOSS = False                  # Set to True to use focal loss
+FOCAL_LOSS = True                  # Set to True to use focal loss
 
 DEFAULT_BALANCED_SAMPLING = False     # Set to True to use balanced sampling
 CLASS_WEIGHTS = True                  # Set to True to use class weights
@@ -87,7 +87,7 @@ def get_output_dir_name():
         f"lr{DEFAULT_LEARNING_RATE}",
         "focal" if FOCAL_LOSS else "ce"
     ])
-OUTPUT_DIR = f"output10_ALL_ME_{get_output_dir_name()}"  
+OUTPUT_DIR = f"output9_ALL_ME_{get_output_dir_name()}"  
 
 # You can still override these defaults via command line:
 # python run_fineTune_single_gpu_launcher.py --waqas-way --lse-tau 0.5 --balanced-sampling True --lr 2e-4
