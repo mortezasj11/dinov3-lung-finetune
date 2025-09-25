@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: msalehjahromi-histology-mnt-me-13
+  name: msalehjahromi-histology-mnt-me-14
   namespace: yn-gpu-workload
   labels:
     k8s-user: msalehjahromi
