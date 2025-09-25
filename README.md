@@ -1,12 +1,13 @@
 # Histology Fine-Tuning (Single GPU)
 
-This repository contains a single-GPU training pipeline for multi-task histology prediction using **pre-trained DINOv2 features extracted from 3-slice CT scans**. The pipeline fine-tunes a transformer-based model for histology classification tasks.
+This repository contains a single-GPU training pipeline for multi-task histology prediction using **pre-trained DINOv2 features from whole CT scans**. The pipeline employs a **Multiple Instance Learning (MIL) approach** to fine-tune a transformer-based model for histology classification tasks, optimized for **A100 GPU** deployment.
 
 ## Key Features
-- **DINOv2 Integration**: Uses pre-trained DINOv2 features from 3-slice CT scan views
+- **DINOv2 Integration**: Uses pre-trained DINOv2 features from whole CT scans
 - **Multi-task Learning**: Handles mutually exclusive groups (histology, metastasis, node, tumor) + binary tasks
 - **Transformer Aggregation**: Attention-based or LSE pooling for feature aggregation
 - **Advanced Loss Functions**: Cross-entropy with label smoothing, optional focal loss
+- **Class Weighting**: Precision-based log exponential weighting method for imbalanced classes
 - **Smart Training**: Cosine LR with warmup, gradient accumulation, balanced sampling
 - **Robust Evaluation**: Confusion matrices, macro/weighted metrics per group
 - **Flexible Deployment**: MNT and SCC Kubernetes job modes
