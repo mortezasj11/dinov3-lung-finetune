@@ -1,13 +1,17 @@
 # Histology Fine-Tuning (Single GPU)
 
-This repository contains a single-GPU training pipeline for multi-task histology prediction using **pre-trained DINOv2 features from whole CT scans**. The pipeline employs a **Multiple Instance Learning (MIL) approach** to fine-tune a transformer-based model for histology classification tasks, optimized for **A100 GPU** deployment.
+This repository contains a single-GPU training pipeline for multi-task histology prediction using **pre-trained DINOv2 features from 3 slices of CT scans**. The pipeline employs a **Multiple Instance Learning (MIL) approach** to fine-tune a transformer-based model for histology classification tasks on whole CT, optimized for **A100 GPU** deployment.
 
 ## Key Features
-- **DINOv2 Integration**: Uses pre-trained DINOv2 features from whole CT scans
+- **DINOv2 Integration**: Uses pre-trained DINOv2 features from 3 slices of CT scans
 - **Multi-task Learning**: Handles mutually exclusive groups (histology, metastasis, node, tumor) + binary tasks
 - **Transformer Aggregation**: Attention-based or LSE pooling for feature aggregation
 - **Advanced Loss Functions**: Cross-entropy with label smoothing, optional focal loss
-- **Class Weighting**: Precision-based log exponential weighting method for imbalanced classes
+- **Uncertainty-Aware Task Balancing** (extended Kendall–Gal):
+  - Per-task uncertainty scaling
+  - Supports regression/classification modes
+  - Can disable tasks globally
+  - Safely skips missing targets (returns zero loss if no tasks are active)
 - **Smart Training**: Cosine LR with warmup, gradient accumulation, balanced sampling
 - **Robust Evaluation**: Confusion matrices, macro/weighted metrics per group
 - **Flexible Deployment**: MNT and SCC Kubernetes job modes
