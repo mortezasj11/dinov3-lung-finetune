@@ -1,18 +1,18 @@
 #!/bin/bash
 ################################################################################
 # Script: log-runner.sh
-# Generated on Thu Sep 25 02:27:56 PM CDT 2025.
+# Generated on Thu Sep 25 02:37:24 PM CDT 2025.
 
 # Set Vars
 LRBASEDIR="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex"
 LRLOGDIR="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs"
 LRKUBECONFIG="/home/msalehjahromi/.kube/config"
-LRJOBNAME="msalehjahromi-histology-mnt-me-1"
+LRJOBNAME="msalehjahromi-histology-mnt-me-5"
 LRCONTAINERNAME="main"
 LRNAMESPACE="yn-gpu-workload"
-LRLOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-1-runner-2025-09-25_142725.log"
-LRCONTAINERLOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-1-main-2025-09-25_142725.log"
-LRJOBDESCRIBELOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-1-describe-2025-09-25_142725.log"
+LRLOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-5-runner-2025-09-25_143653.log"
+LRCONTAINERLOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-5-main-2025-09-25_143653.log"
+LRJOBDESCRIBELOGFILE="/rsrch7/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/code_1gpu_loss_wrapper_muex/logs/msalehjahromi-histology-mnt-me-5-describe-2025-09-25_143653.log"
 MyUser="msalehjahromi"
 
 # Logging that the log-runner has started.
