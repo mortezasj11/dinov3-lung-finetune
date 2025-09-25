@@ -9,9 +9,9 @@ This repository contains a single-GPU training pipeline for multi-task histology
 - **Advanced Loss Functions**: Cross-entropy with label smoothing, optional focal loss
 - **Uncertainty-Aware Task Balancing** (extended Kendall–Gal):
   - Per-task uncertainty scaling
-  - Supports regression/classification modes
-  - Can disable tasks globally
   - Safely skips missing targets (returns zero loss if no tasks are active)
+  - Supports regression/classification scaling
+
 - **Smart Training**: Cosine LR with warmup, gradient accumulation, balanced sampling
 - **Robust Evaluation**: Confusion matrices, macro/weighted metrics per group
 - **Flexible Deployment**: MNT and SCC Kubernetes job modes
