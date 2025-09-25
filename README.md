@@ -41,10 +41,22 @@ The loader will map file paths in the CSV to /shared/ready_finetune_max192_npz (
 
 ```bash
 python run_fineTune_single_gpu_launcher_mnt.py \
-  --csv /rsrch7/.../FineTune/CSVs/ready_finetune_tXXXX_vYYY.csv \
+  --csv /rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/CSVs/ready_finetune_t1919_v500_all_info.csv \
   --groups "[['is_scc','is_adenocarcinoma','is_other'],['is_M0','is_M1A','is_M1B','is_M1C'],['is_N0','is_N1','is_N2','is_N3'],['is_T0','is_T1','is_T2','is_T3','is_T4']]" \
   --binary-names is_mw \
-  --output /rsrch7/.../FineTune/output/outputSepXX/OUTPUT_DIR \
+  --output /rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/output/outputSep20_MNT/output18_ALL_ME_waqas_tau1.0_unbalanced_weighted_lr0.001 \
+  --lr 1e-3 --epochs 50 --accum-steps 200 --val-every 3000 --print-every 600
+```
+
+Example with custom group names (main script supports `--group-names` for display):
+
+```bash
+python run_fineTune_single_gpu_launcher_mnt.py \
+  --csv /rsrch7/.../FineTune/CSVs/ready_finetune_t1919_v500_all_info.csv \
+  --groups "[['is_scc','is_adenocarcinoma','is_other'],['is_M0','is_M1A','is_M1B','is_M1C'],['is_N0','is_N1','is_N2','is_N3'],['is_T0','is_T1','is_T2','is_T3','is_T4']]" \
+  --group-names histology metastasis node tumor \
+  --binary-names is_mw \
+  --output /rsrch7/.../outputSep20_MNT/output18_ALL_ME_example \
   --lr 1e-3 --epochs 50 --accum-steps 200 --val-every 3000 --print-every 600
 ```
 
@@ -129,66 +141,66 @@ python 2_run_fineTune_single_gpu_learnable_loss-wrapper.py \
 - Training randomly keeps a fraction of chunks per sample (r∈[0.3,1.0]) and applies simple order augment.
 - Binary tasks (if any) use BCE with optional `pos_weight`.
 
+## Hyperparameter Grid
 
+| Run | Learning Rate | LSE Tau | Waqas Attention | Focal Loss | Job Name Hint |
+| --- | ------------- | ------- | --------------- | ---------- | ------------- |
+| 1   | 2e-4          | 0.33    | True            | True       | lr2e-4_tau0.33_waqasT_focalT |
+| 2   | 2e-4          | 0.33    | True            | False      | lr2e-4_tau0.33_waqasT_focalF |
+| 3   | 2e-4          | 0.33    | False           | True       | lr2e-4_tau0.33_waqasF_focalT |
+| 4   | 2e-4          | 0.33    | False           | False      | lr2e-4_tau0.33_waqasF_focalF |
+| 5   | 2e-4          | 1.0     | True            | True       | lr2e-4_tau1.0_waqasT_focalT |
+| 6   | 2e-4          | 1.0     | True            | False      | lr2e-4_tau1.0_waqasT_focalF |
+| 7   | 2e-4          | 1.0     | False           | True       | lr2e-4_tau1.0_waqasF_focalT |
+| 8   | 2e-4          | 1.0     | False           | False      | lr2e-4_tau1.0_waqasF_focalF |
+| 9   | 1e-3          | 0.33    | True            | True       | lr1e-3_tau0.33_waqasT_focalT |
+| 10  | 1e-3          | 0.33    | True            | False      | lr1e-3_tau0.33_waqasT_focalF |
+| 11  | 1e-3          | 0.33    | False           | True       | lr1e-3_tau0.33_waqasF_focalT |
+| 12  | 1e-3          | 0.33    | False           | False      | lr1e-3_tau0.33_waqasF_focalF |
+| 13  | 1e-3          | 1.0     | True            | True       | lr1e-3_tau1.0_waqasT_focalT |
+| 14  | 1e-3          | 1.0     | True            | False      | lr1e-3_tau1.0_waqasT_focalF |
+| 15  | 1e-3          | 1.0     | False           | True       | lr1e-3_tau1.0_waqasF_focalT |
+| 16  | 1e-3          | 1.0     | False           | False      | lr1e-3_tau1.0_waqasF_focalF |
+| 17  | 5e-3          | 0.33    | True            | True       | lr5e-3_tau0.33_waqasT_focalT |
+| 18  | 5e-3          | 0.33    | True            | False      | lr5e-3_tau0.33_waqasT_focalF |
+| 19  | 5e-3          | 0.33    | False           | True       | lr5e-3_tau0.33_waqasF_focalT |
+| 20  | 5e-3          | 0.33    | False           | False      | lr5e-3_tau0.33_waqasF_focalF |
+| 21  | 5e-3          | 1.0     | True            | True       | lr5e-3_tau1.0_waqasT_focalT |
+| 22  | 5e-3          | 1.0     | True            | False      | lr5e-3_tau1.0_waqasT_focalF |
+| 23  | 5e-3          | 1.0     | False           | True       | lr5e-3_tau1.0_waqasF_focalT |
+| 24  | 5e-3          | 1.0     | False           | False      | lr5e-3_tau1.0_waqasF_focalF |
 
+## Kubernetes Deployment
 
-# Hyperparameters for finetuning
-
-| Run | DEFAULT_LEARNING_RATE | DEFAULT_LSE_TAU | DEFAULT_WAQAS_WAY | DEFAULT_USE_FOCAL_LOSS | k8s (job name hint)                  |
-| --- | --------------------- | --------------- | ----------------- | ---------------------- | ------------------------------------ |
-| 1   | 2e-4                  | 0.33            | True              | True                   | lr2e-4_tau0.33_waqasT_focalT         |
-| 2   | 2e-4                  | 0.33            | True              | False                  | lr2e-4_tau0.33_waqasT_focalF         |
-| 3   | 2e-4                  | 0.33            | False             | True                   | lr2e-4_tau0.33_waqasF_focalT         |
-| 4   | 2e-4                  | 0.33            | False             | False                  | lr2e-4_tau0.33_waqasF_focalF         |
-| 5   | 2e-4                  | 1.0             | True              | True                   | lr2e-4_tau1.0_waqasT_focalT          |
-| 6   | 2e-4                  | 1.0             | True              | False                  | lr2e-4_tau1.0_waqasT_focalF          |
-| 7   | 2e-4                  | 1.0             | False             | True                   | lr2e-4_tau1.0_waqasF_focalT          |
-| 8   | 2e-4                  | 1.0             | False             | False                  | lr2e-4_tau1.0_waqasF_focalF          |
-| 9   | 1e-3                  | 0.33            | True              | True                   | lr1e-3_tau0.33_waqasT_focalT         |
-| 10  | 1e-3                  | 0.33            | True              | False                  | lr1e-3_tau0.33_waqasT_focalF         |
-| 11  | 1e-3                  | 0.33            | False             | True                   | lr1e-3_tau0.33_waqasF_focalT         |
-| 12  | 1e-3                  | 0.33            | False             | False                  | lr1e-3_tau0.33_waqasF_focalF         |
-| 13  | 1e-3                  | 1.0             | True              | True                   | lr1e-3_tau1.0_waqasT_focalT          |    t
-| 14  | 1e-3                  | 1.0             | True              | False                  | lr1e-3_tau1.0_waqasT_focalF          |    t
-| 15  | 1e-3                  | 1.0             | False             | True                   | lr1e-3_tau1.0_waqasF_focalT          |    t
-| 16  | 1e-3                  | 1.0             | False             | False                  | lr1e-3_tau1.0_waqasF_focalF          |    t
-| 17  | 5e-3                  | 0.33            | True              | True                   | lr5e-3_tau0.33_waqasT_focalT         |
-| 18  | 5e-3                  | 0.33            | True              | False                  | lr5e-3_tau0.33_waqasT_focalF         |
-| 19  | 5e-3                  | 0.33            | False             | True                   | lr5e-3_tau0.33_waqasF_focalT         |
-| 20  | 5e-3                  | 0.33            | False             | False                  | lr5e-3_tau0.33_waqasF_focalF         |
-| 21  | 5e-3                  | 1.0             | True              | True                   | lr5e-3_tau1.0_waqasT_focalT          |
-| 22  | 5e-3                  | 1.0             | True              | False                  | lr5e-3_tau1.0_waqasT_focalF          |
-| 23  | 5e-3                  | 1.0             | False             | True                   | lr5e-3_tau1.0_waqasF_focalT          |
-| 24  | 5e-3                  | 1.0             | False             | False                  | lr5e-3_tau1.0_waqasF_focalF          |
-
-
-yamls 
-    -name                                                              X
-    -launcher
-
-launcher
-    params                                                             X
-    OUTPUT_DIR = f"output18_ALL_ME_{get_output_dir_name()}"            X
-    output
-    csv
-
-
-
-PATH="/rsrch1/ip/msalehjahromi/.kube:$PATH“
-
-
-
-in 10.68.16.150
+### MNT Job Submission
+```bash
+# Set up kubectl access
+export PATH="/rsrch1/ip/msalehjahromi/.kube:$PATH"
 mkdir -p ~/.kube
 ln -sf /rsrch1/ip/msalehjahromi/.kube/config ~/.kube/config
+
+# Submit MNT job
+job-runner.sh mnt-job-submit.yaml
+```
+
+### SCC Job Submission
+```bash
+# Submit SCC job
 job-runner.sh scc-job-submit.yaml
 
+# Or apply directly
+kubectl apply -f scc-job-submit.yaml
+```
 
-iostat -xz 1 5
-
-
-
-
-job-runner.sh job1.yaml
-kubectl apply -f job1.yaml
+### Job Management
+```bash
+# Delete specific job
 kubectl delete job -n yn-gpu-workload msalehjahromi-histology6
+
+# Monitor system resources
+iostat -xz 1 5
+```
+
+
+
+
