@@ -52,6 +52,8 @@ FOCAL_LOSS = True                  # Set to True to use focal loss
 DEFAULT_BALANCED_SAMPLING = False     # Set to True to use balanced sampling
 CLASS_WEIGHTS = True                  # Set to True to use class weights
 
+BACKBONE_FREEZE = True                # Set to True to freeze the backbone
+
 
 def get_output_dir_name():
     return "_".join([
@@ -64,19 +66,6 @@ def get_output_dir_name():
     ])
 OUTPUT_DIR = f"output17_ALL_ME_noMW_{get_output_dir_name()}"
 
-# You can still override these defaults via command line:
-# python run_fineTune_single_gpu_launcher.py --waqas-way --lse-tau 0.5 --balanced-sampling True --lr 2e-4
-# =============================================================================
-
-print(f"CONFIGURATION:")
-print(f"  Waqas Way: {DEFAULT_WAQAS_WAY}")
-print(f"  LSE Tau: {DEFAULT_LSE_TAU}")
-print(f"  Balanced Sampling: {DEFAULT_BALANCED_SAMPLING}")
-print(f"  Learning Rate: {DEFAULT_LEARNING_RATE}")
-print(f"  Class Weights: {CLASS_WEIGHTS}")
-print(f"  Output Directory: {OUTPUT_DIR}")
-print("=" * 50)
-
 # Log the configuration as well
 logging.info("=" * 50)
 logging.info("LAUNCHER CONFIGURATION")
@@ -86,17 +75,17 @@ logging.info(f"LSE Tau: {DEFAULT_LSE_TAU}")
 logging.info(f"Balanced Sampling: {DEFAULT_BALANCED_SAMPLING}")
 logging.info(f"Learning Rate: {DEFAULT_LEARNING_RATE}")
 logging.info(f"Class Weights: {CLASS_WEIGHTS}")
+logging.info(f"Freeze Backbone: {BACKBONE_FREEZE}")
 logging.info(f"Focal Loss: {FOCAL_LOSS}")
 logging.info(f"Output Directory: {OUTPUT_DIR}")
 logging.info("=" * 50)
 
-LOG_DIR = "/rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune"
-os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "gpu_info.log"),
+    filename=os.path.join(OUTPUT_DIR if os.path.isabs(OUTPUT_DIR) else "/tmp", "training.log"),
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(message)s",
+    force=True,
 )
 
 def log_gpu_info():
@@ -420,8 +409,9 @@ def run_training():
     # New parameter for no-load-pretrained
     parser.add_argument("--no-load-pretrained", action="store_true",
                         help="Whether to load pretrained model (default: False)")
-    parser.add_argument("--no-freeze-backbone", action="store_true",
-                        help="Disable freezing the DINO backbone (train all parameters) - DEFAULT: backbone is frozen")
+    parser.add_argument("--no-freeze-backbone",
+        type=lambda s: s.lower() == "true", default=(not BACKBONE_FREEZE),
+        help=( "Disable freezing the DINO backbone (train all parameters). "f"Accepts True/False. Default: {str(not BACKBONE_FREEZE)} "),)
     parser.add_argument("--no-learnable-weights", action="store_true",
                         help="Disable learnable task weights (use equal weights) - DEFAULT: learnable weights are enabled")
     parser.add_argument("--loss-wrapper", type=str, choices=["multitask"], default="multitask",

@@ -13,36 +13,6 @@ import torch
 # | --- | --------------------- | --------------- | ----------------- | ---------------------- | ------------------------------------ |
 # | 1   | 2e-4                  | 0.33            | True              | True                   | lr2e-4_tau0.33_waqasT_focalT         |
 # | 2   | 2e-4                  | 0.33            | True              | False                  | lr2e-4_tau0.33_waqasT_focalF         |
-# | 3   | 2e-4                  | 0.33            | False             | True                   | lr2e-4_tau0.33_waqasF_focalT         |
-# | 4   | 2e-4                  | 0.33            | False             | False                  | lr2e-4_tau0.33_waqasF_focalF         |
-# | 5   | 2e-4                  | 1.0             | True              | True                   | lr2e-4_tau1.0_waqasT_focalT          |
-# | 6   | 2e-4                  | 1.0             | True              | False                  | lr2e-4_tau1.0_waqasT_focalF          |
-# | 7   | 2e-4                  | 1.0             | False             | True                   | lr2e-4_tau1.0_waqasF_focalT          |
-# | 8   | 2e-4                  | 1.0             | False             | False                  | lr2e-4_tau1.0_waqasF_focalF          |
-# | 9   | 1e-3                  | 0.33            | True              | True                   | lr1e-3_tau0.33_waqasT_focalT         |
-# | 10  | 1e-3                  | 0.33            | True              | False                  | lr1e-3_tau0.33_waqasT_focalF         |
-# | 11  | 1e-3                  | 0.33            | False             | True                   | lr1e-3_tau0.33_waqasF_focalT         |
-# | 12  | 1e-3                  | 0.33            | False             | False                  | lr1e-3_tau0.33_waqasF_focalF         |
-# | 13  | 1e-3                  | 1.0             | True              | True                   | lr1e-3_tau1.0_waqasT_focalT          |
-# | 14  | 1e-3                  | 1.0             | True              | False                  | lr1e-3_tau1.0_waqasT_focalF          |
-# | 15  | 1e-3                  | 1.0             | False             | True                   | lr1e-3_tau1.0_waqasF_focalT          |
-# | 16  | 1e-3                  | 1.0             | False             | False                  | lr1e-3_tau1.0_waqasF_focalF          |
-# | 17  | 5e-3                  | 0.33            | True              | True                   | lr5e-3_tau0.33_waqasT_focalT         |
-# | 18  | 5e-3                  | 0.33            | True              | False                  | lr5e-3_tau0.33_waqasT_focalF         |
-# | 19  | 5e-3                  | 0.33            | False             | True                   | lr5e-3_tau0.33_waqasF_focalT         |
-# | 20  | 5e-3                  | 0.33            | False             | False                  | lr5e-3_tau0.33_waqasF_focalF         |
-# | 21  | 5e-3                  | 1.0             | True              | True                   | lr5e-3_tau1.0_waqasT_focalT          |
-# | 22  | 5e-3                  | 1.0             | True              | False                  | lr5e-3_tau1.0_waqasT_focalF          |
-# | 23  | 5e-3                  | 1.0             | False             | True                   | lr5e-3_tau1.0_waqasF_focalT          |
-# | 24  | 5e-3                  | 1.0             | False             | False                  | lr5e-3_tau1.0_waqasF_focalF          |
-
-
-
-
-# | Run | DEFAULT_LEARNING_RATE | DEFAULT_LSE_TAU | DEFAULT_WAQAS_WAY | DEFAULT_USE_FOCAL_LOSS | k8s (job name hint)                  |
-# | --- | --------------------- | --------------- | ----------------- | ---------------------- | ------------------------------------ |
-# | 1   | 2e-4                  | 0.33            | True              | True                   | lr2e-4_tau0.33_waqasT_focalT         |
-# | 2   | 2e-4                  | 0.33            | True              | False                  | lr2e-4_tau0.33_waqasT_focalF         |
 
 # | 5   | 2e-4                  | 1.0             | True              | True                   | lr2e-4_tau1.0_waqasT_focalT          |
 # | 6   | 2e-4                  | 1.0             | True              | False                  | lr2e-4_tau1.0_waqasT_focalF          |
@@ -69,14 +39,15 @@ print("DEBUG: Single-GPU launcher script is starting...")
 # =============================================================================
 # Simply change these values below to modify the default behavior:
 
-DEFAULT_LEARNING_RATE = 5e-3       # Learning rate for training
+DEFAULT_LEARNING_RATE = 1e-3       # Learning rate for training
 DEFAULT_LSE_TAU = 1.0               # Temperature parameter for LSE aggregation
 DEFAULT_WAQAS_WAY = True             # Set to True to use Waqas attention aggregation
-FOCAL_LOSS = False                  # Set to True to use focal loss
+FOCAL_LOSS = True                  # Set to True to use focal loss
+
+BACKBONE_FREEZE = False                # Set to True to freeze the backbone
 
 DEFAULT_BALANCED_SAMPLING = False     # Set to True to use balanced sampling
 CLASS_WEIGHTS = True                  # Set to True to use class weights
-
 
 def get_output_dir_name():
     return "_".join([
@@ -85,22 +56,10 @@ def get_output_dir_name():
         "balanced" if DEFAULT_BALANCED_SAMPLING else "unbalanced",
         "weighted" if CLASS_WEIGHTS else "unweighted",
         f"lr{DEFAULT_LEARNING_RATE}",
-        "focal" if FOCAL_LOSS else "ce"
+        "focal" if FOCAL_LOSS else "ce",
+        "backbone_frozen" if BACKBONE_FREEZE else "backbone_trainable"
     ])
-OUTPUT_DIR = f"output22_ALL_ME_{get_output_dir_name()}"  
-
-# You can still override these defaults via command line:
-# python run_fineTune_single_gpu_launcher.py --waqas-way --lse-tau 0.5 --balanced-sampling True --lr 2e-4
-# =============================================================================
-
-print(f"CONFIGURATION:")
-print(f"  Waqas Way: {DEFAULT_WAQAS_WAY}")
-print(f"  LSE Tau: {DEFAULT_LSE_TAU}")
-print(f"  Balanced Sampling: {DEFAULT_BALANCED_SAMPLING}")
-print(f"  Learning Rate: {DEFAULT_LEARNING_RATE}")
-print(f"  Class Weights: {CLASS_WEIGHTS}")
-print(f"  Output Directory: {OUTPUT_DIR}")
-print("=" * 50)
+OUTPUT_DIR = f"output13_ALL_ME_{get_output_dir_name()}"     
 
 # Log the configuration as well
 logging.info("=" * 50)
@@ -111,18 +70,12 @@ logging.info(f"LSE Tau: {DEFAULT_LSE_TAU}")
 logging.info(f"Balanced Sampling: {DEFAULT_BALANCED_SAMPLING}")
 logging.info(f"Learning Rate: {DEFAULT_LEARNING_RATE}")
 logging.info(f"Class Weights: {CLASS_WEIGHTS}")
+logging.info(f"Freeze Backbone: {BACKBONE_FREEZE}")
 logging.info(f"Focal Loss: {FOCAL_LOSS}")
 logging.info(f"Output Directory: {OUTPUT_DIR}")
 logging.info("=" * 50)
 
-LOG_DIR = "/rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune"
-os.makedirs(LOG_DIR, exist_ok=True)
-
-logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "gpu_info.log"),
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-)
+# Deprecated: logging now goes to {output}/training.log configured after parsing args
 
 def log_gpu_info():
     """Log GPU information for single-GPU setup"""
@@ -319,6 +272,7 @@ def main(args):
         print(f"DEBUG: No --no-load-pretrained flag (args.no_load_pretrained = {args.no_load_pretrained})")
     
     # Add no-freeze-backbone flag if user wants to train all parameters
+    # Also map BACKBONE_FREEZE default into the arg when the user does not pass it
     if args.no_freeze_backbone:
         python_command.append("--no-freeze-backbone")
         print(f"DEBUG: Added --no-freeze-backbone flag to command (backbone will be trainable)")
@@ -408,8 +362,7 @@ def run_training():
     parser.add_argument("--optimizer", type=str, default="adamw", 
                        choices=["adam", "adamw", "sgd"], 
                        help="Optimizer to use")
-    
-    
+
     # Model parameters
     parser.add_argument("--num-attn-heads", type=int, default=3, 
                        help="Number of attention heads in the transformer aggregator")
@@ -422,7 +375,7 @@ def run_training():
     
     # Output parameters
     parser.add_argument("--output", type=str, 
-                       default=os.path.join("/rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/output/outputSep25_MNT/", OUTPUT_DIR),
+                       default=os.path.join("/rsrch7/home/ip_rsrch/wulab/Lung_Foundation_Model_Data_/Down-stream_tasks/Histology/FineTune/output/outputSep26_MNT/", OUTPUT_DIR),
                        help="Output directory for logs and checkpoints")
     parser.add_argument("--print-every", type=int, default=500, 
                        help="Print training stats every N steps")
@@ -445,8 +398,9 @@ def run_training():
     # New parameter for no-load-pretrained
     parser.add_argument("--no-load-pretrained", action="store_true",
                         help="Whether to load pretrained model (default: False)")
-    parser.add_argument("--no-freeze-backbone", action="store_true",
-                        help="Disable freezing the DINO backbone (train all parameters) - DEFAULT: backbone is frozen")
+    parser.add_argument("--no-freeze-backbone",
+        type=lambda s: s.lower() == "true", default=(not BACKBONE_FREEZE),
+        help=( "Disable freezing the DINO backbone (train all parameters). "f"Accepts True/False. Default: {str(not BACKBONE_FREEZE)} "),)
     parser.add_argument("--no-learnable-weights", action="store_true",
                         help="Disable learnable task weights (use equal weights) - DEFAULT: learnable weights are enabled")
     parser.add_argument("--loss-wrapper", type=str, choices=["multitask"], default="multitask",
@@ -467,6 +421,14 @@ def run_training():
     
     # Create output directory if it doesn't exist
     os.makedirs(args.output, exist_ok=True)
+
+    # Redirect launcher logging to training.log inside the chosen output directory
+    logging.basicConfig(
+        filename=os.path.join(args.output, "training.log"),
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        force=True,
+    )
     
     print(f"DEBUG: Single-GPU launcher received args.no_load_pretrained = {args.no_load_pretrained}")
     print(f"DEBUG: All launcher args: {vars(args)}")

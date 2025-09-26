@@ -122,17 +122,18 @@ class SingleGPUTrainer:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         # Label smoothing factor for CE on group heads
         self.ce_smoothing = 0.05
+        self.base_decrease_factor = 0.004  # lower LR for pretrained DinoVisionTransformer
 
         # Use provided group definitions or defaults
-        if groups_def is None:
-            groups_def = {
-                'histology':   ['is_scc', 'is_adenocarcinoma', 'is_other'],
-                'metastasis':  ['is_M0', 'is_M1A', 'is_M1B', 'is_M1C'],
-                'node':        ['is_N0', 'is_N1', 'is_N2', 'is_N3'],
-                'tumor':       ['is_T0', 'is_T1', 'is_T2', 'is_T3', 'is_T4'],
-            }
-        if binary_names is None:
-            binary_names = ['is_mw']
+        # if groups_def is None:
+        #     groups_def = {
+        #         'histology':   ['is_scc', 'is_adenocarcinoma', 'is_other'],
+        #         'metastasis':  ['is_M0', 'is_M1A', 'is_M1B', 'is_M1C'],
+        #         'node':        ['is_N0', 'is_N1', 'is_N2', 'is_N3'],
+        #         'tumor':       ['is_T0', 'is_T1', 'is_T2', 'is_T3', 'is_T4'],
+        #     }
+        # if binary_names is None:
+        #     binary_names = ['is_mw']
 
         # Build index groups once
         self.idx_groups, self.binary_idxs = build_index_groups(self.label_cols, groups_def, binary_names)
@@ -169,31 +170,11 @@ class SingleGPUTrainer:
         self.last_validated_step = -1
         self._prev_global_step = -1
 
-        # Print configuration
-        print("\nTraining Configuration:")
-        print(f"split_col: {self.args.split_col}")
-        print(f"Max chunks per sample: {self.args.max_chunks}")
-        print(f"Learning rate: {self.args.lr}")
-        print(f"Gradient accumulation steps: {self.args.accum_steps}")
-        print(f"Number of tasks: {len(self.label_cols)}")
-        print(f"Validation frequency: {self.args.val_every} steps")
-        print(f"Number of epochs: {self.args.epochs}")
-        print(f"Warmup steps: {self.args.warmup_steps}")
-        print(f"LSE tau (temperature): {self.args.lse_tau}")
-        print(f"Waqas way: {'Enabled' if self.args.waqas_way else 'Disabled'}")
-        print(f"Device: {self.device}")
-        print(f"Model initialization: {'Pretrained weights' if self.used_pretrained_weights else 'Random initialization'}")
-        print(f"Balanced sampling: {'Enabled' if self.args.balanced_sampling else 'Disabled'}")
-        if self.args.no_learnable_weights:
-            print(f"Learnable task weights: Disabled (using equal weights)")
-        else:
-            print(f"Learnable task weights: UncertaintyWeightedSumNamed")
-        print()
         logging.info("------ Training Configuration ------")
         logging.info(f"split_col                     : {self.args.split_col}")
         logging.info(f"Max chunks per sample         : {self.args.max_chunks}")
         logging.info(f"Learning rate (aggregator)    : {self.args.lr}")
-        logging.info(f"Learning rate (base)          : {self.args.lr*0.2}")
+        logging.info(f"Learning rate (base)          : {self.args.lr * self.base_decrease_factor}")
         logging.info(f"Gradient accumulation steps   : {self.args.accum_steps}")
         logging.info(f"Warm-up steps                 : {self.args.warmup_steps}")
         logging.info(f"Aggregator layers / heads     : {self.args.num_layers} / {self.args.num_attn_heads}")
@@ -327,17 +308,17 @@ class SingleGPUTrainer:
 
         # Apply unfreeze_after_heads to model_ct (base model)
         if not self.args.no_freeze_backbone:
-            print("Applying unfreeze_after_heads to DINO backbone...")
+            logging.info("Applying unfreeze_after_heads to DINO backbone...")
             total_trainable = unfreeze_after_heads(model_ct)
-            print(f"DINO backbone configured with {total_trainable:,} trainable parameters!")
+            logging.info(f"DINO backbone configured with {total_trainable:,} trainable parameters!")
         else:
-            print("DINO backbone will be trainable (all parameters)")
+            logging.info("DINO backbone will be trainable (all parameters)")
 
         # Sanity check: prove that base backbone freezing took effect through self.model
         backbone_params = sum(p.numel() for n,p in self.model.named_parameters() if n.startswith("base.") and p.requires_grad)
         agg_params      = sum(p.numel() for n,p in self.model.named_parameters() if not n.startswith("base.") and p.requires_grad)
-        print(f"[CHECK] Trainable in backbone: {backbone_params:,}")
-        print(f"[CHECK] Trainable in aggregator/head: {agg_params:,}")
+        logging.info(f"[CHECK] Trainable in backbone: {backbone_params:,}")
+        logging.info(f"[CHECK] Trainable in aggregator/head: {agg_params:,}")
 
         self.start_epoch = load_latest_checkpoint(
             self.model,
@@ -396,7 +377,7 @@ class SingleGPUTrainer:
         """Initialize the optimizer with parameter groups"""
         # Define learning rates
         main_lr = self.args.lr
-        base_lr = self.args.lr * 0.2  # lower LR for pretrained DinoVisionTransformer
+        base_lr = self.args.lr * self.base_decrease_factor
 
         # Separate base and aggregator parameters
         base_params, agg_params = [], []
@@ -887,11 +868,11 @@ class SingleGPUTrainer:
                     )
 
                     line = (f"Step {self.global_iter:>7}  "
-                            f"Ep {self.current_epoch+1:02d}  "
-                            f"loss {step_metrics['loss']:.4f}  "
-                            f"lr {step_metrics['lr']:.6f}  "
-                            f"fetch {self.fetch_avg:6.1f} ms  "
-                            f"compute {self.compute_avg:6.1f} ms")
+                          f"Ep {self.current_epoch+1:02d}  "
+                          f"loss {step_metrics['loss']:.4f}  "
+                          f"lr {step_metrics['lr']:.6f}  "
+                          f"fetch {self.fetch_avg:6.1f} ms  "
+                          f"compute {self.compute_avg:6.1f} ms")
                     print("\n" + line)
                     logging.info(line)
 

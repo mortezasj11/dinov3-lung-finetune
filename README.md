@@ -125,6 +125,25 @@ kubectl delete job -n yn-gpu-workload msalehjahromi-histology6
 iostat -xz 1 5
 ```
 
+## Results Interpretation
+
+The training pipeline generates comprehensive results that can be visualized and analyzed. The `ft_acc.png` file provides a visual representation of the model's performance across different tasks and metrics.
+
+### Understanding the Results Visualization
+
+The results visualization shows:
+- **Training Progress**: Loss curves and learning rate schedules
+- **Task Performance**: Accuracy, sensitivity, and specificity for each task group
+- **Validation Metrics**: Confusion matrices and per-class performance
+- **Model Convergence**: How the model learns over training epochs
+
+### Results Visualization
+
+<img src="images/ft_acc.png" alt="Fine-tuning Accuracy Results" width="600">
+
+*Visualization showing model performance across different histology prediction tasks during fine-tuning*
+
+
 
 
 
